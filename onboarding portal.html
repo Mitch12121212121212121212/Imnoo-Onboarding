@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Imnoo | Customer Onboarding</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg-primary: #0b1219;
+    --bg-secondary: #111d2a;
+    --bg-card: #162332;
+    --bg-card-hover: #1c2d3e;
+    --accent: #00BFA5;
+    --accent-light: #33CFBA;
+    --accent-glow: rgba(0, 191, 165, 0.12);
+    --accent-glow-strong: rgba(0, 191, 165, 0.25);
+    --accent-dark: #009E89;
+    --success: #00BFA5;
+    --success-glow: rgba(0, 191, 165, 0.15);
+    --warning: #F5A623;
+    --text-primary: #eef2f6;
+    --text-secondary: #8fa3b8;
+    --text-muted: #5e7a94;
+    --border: #1a2e40;
+    --border-light: #2a4058;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* Subtle grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0, 191, 165, 0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 191, 165, 0.025) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ---- NAV ---- */
+  nav {
+    position: fixed; top: 0; width: 100%; z-index: 100;
+    background: rgba(11, 18, 25, 0.88);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+  }
+  .nav-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+  }
+  .logo {
+    font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px;
+    color: var(--accent);
+  }
+  .nav-progress {
+    display: flex; align-items: center; gap: 6px;
+  }
+  .nav-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--border-light); transition: all 0.4s;
+    cursor: pointer;
+  }
+  .nav-dot.completed { background: var(--success); box-shadow: 0 0 8px var(--success-glow); }
+  .nav-dot.active { background: var(--accent); box-shadow: 0 0 8px var(--accent-glow-strong); transform: scale(1.3); }
+  .nav-line { width: 20px; height: 2px; background: var(--border-light); }
+  .nav-line.completed { background: var(--success); }
+
+  /* ---- HERO ---- */
+  .hero {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center; padding: 6rem 2rem 4rem;
+  }
+  .hero-glow {
+    position: absolute; top: 20%; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 600px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,191,165,0.07), transparent 70%);
+    pointer-events: none;
+  }
+  .hero-content { position: relative; max-width: 700px; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 16px; border-radius: 20px;
+    background: var(--accent-glow); border: 1px solid rgba(0,191,165,0.2);
+    font-size: 0.8rem; font-weight: 500; color: var(--accent-light);
+    margin-bottom: 1.5rem; letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  .hero-badge .pulse {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.5); }
+  }
+  .hero h1 {
+    font-size: 3.2rem; font-weight: 800; line-height: 1.15;
+    letter-spacing: -1.5px; margin-bottom: 1.2rem;
+  }
+  .hero h1 .gradient {
+    background: linear-gradient(135deg, var(--accent-light), var(--accent));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero p {
+    font-size: 1.15rem; color: var(--text-secondary); max-width: 540px;
+    margin: 0 auto 2.5rem; line-height: 1.7;
+  }
+  .hero-cta {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 14px 32px; border-radius: 12px; border: none;
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    color: #fff; font-size: 1rem; font-weight: 600;
+    cursor: pointer; transition: all 0.3s;
+    box-shadow: 0 4px 20px rgba(0,191,165,0.3);
+  }
+  .hero-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,191,165,0.4); }
+  .hero-cta svg { width: 18px; height: 18px; }
+  .scroll-hint {
+    position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float { 0%,100%{ transform: translateX(-50%) translateY(0); } 50%{ transform: translateX(-50%) translateY(8px); } }
+
+  /* ---- STEP SECTIONS ---- */
+  .step-section {
+    position: relative; z-index: 1;
+    min-height: 100vh; padding: 6rem 2rem;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transform: translateY(40px);
+    transition: opacity 0.8s, transform 0.8s;
+  }
+  .step-section.visible { opacity: 1; transform: translateY(0); }
+  .step-inner {
+    max-width: 1100px; width: 100%;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;
+    align-items: center;
+  }
+  .step-section:nth-child(odd) .step-inner { direction: rtl; }
+  .step-section:nth-child(odd) .step-inner > * { direction: ltr; }
+
+  .step-info { display: flex; flex-direction: column; gap: 1.2rem; }
+  .step-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem; font-weight: 500; color: var(--accent);
+    letter-spacing: 2px; text-transform: uppercase;
+  }
+  .step-info h2 { font-size: 2rem; font-weight: 700; letter-spacing: -0.5px; line-height: 1.2; }
+  .step-info p { color: var(--text-secondary); font-size: 1rem; line-height: 1.7; }
+  .step-features {
+    display: flex; flex-direction: column; gap: 10px; margin-top: 0.5rem;
+  }
+  .step-feature {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 0.9rem; color: var(--text-secondary);
+  }
+  .step-feature .icon {
+    flex-shrink: 0; width: 20px; height: 20px; margin-top: 2px;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    background: var(--accent-glow); color: var(--accent-light); font-size: 0.65rem;
+  }
+
+  /* Interactive cards */
+  .step-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px; padding: 2rem;
+    transition: all 0.4s;
+    position: relative; overflow: hidden;
+  }
+  .step-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-dark));
+    opacity: 0; transition: opacity 0.4s;
+  }
+  .step-card:hover::before { opacity: 1; }
+  .step-card:hover { border-color: var(--border-light); transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+
+  /* Form elements */
+  .form-group { margin-bottom: 1.2rem; }
+  .form-label {
+    display: block; font-size: 0.8rem; font-weight: 500;
+    color: var(--text-secondary); margin-bottom: 6px;
+    letter-spacing: 0.3px; text-transform: uppercase;
+  }
+  .form-input, .form-select, .form-textarea {
+    width: 100%; padding: 10px 14px;
+    background: var(--bg-secondary); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text-primary); font-family: inherit;
+    font-size: 0.9rem; transition: all 0.3s; outline: none;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+  .form-textarea { resize: vertical; min-height: 80px; }
+  .form-select { cursor: pointer; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238fa3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center;
+  }
+  .form-select option { background: var(--bg-secondary); }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 24px; border-radius: 8px; border: none;
+    font-size: 0.9rem; font-weight: 600; cursor: pointer;
+    transition: all 0.3s;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    color: #fff; box-shadow: 0 2px 12px rgba(0,191,165,0.25);
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,191,165,0.35); }
+  .btn-outline {
+    background: transparent; border: 1px solid var(--border-light);
+    color: var(--text-secondary);
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent-light); }
+  .btn-success {
+    background: linear-gradient(135deg, var(--success), var(--accent-dark));
+    color: #fff;
+  }
+
+  /* Milestone cards */
+  .milestone-grid { display: flex; flex-direction: column; gap: 12px; }
+  .milestone-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px; border-radius: 10px;
+    background: var(--bg-secondary); border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.3s;
+  }
+  .milestone-item:hover { border-color: var(--accent); background: var(--bg-card-hover); }
+  .milestone-item.selected { border-color: var(--success); background: rgba(0,191,165,0.05); }
+  .milestone-check {
+    width: 22px; height: 22px; border-radius: 6px; flex-shrink: 0;
+    border: 2px solid var(--border-light);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s; font-size: 0.7rem; color: transparent;
+  }
+  .milestone-item.selected .milestone-check {
+    background: var(--success); border-color: var(--success); color: #fff;
+  }
+  .milestone-text { font-size: 0.88rem; }
+  .milestone-text small { display: block; color: var(--text-muted); font-size: 0.75rem; margin-top: 2px; }
+
+  /* Video grid */
+  .video-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .video-card {
+    padding: 16px; border-radius: 10px;
+    background: var(--bg-secondary); border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.3s;
+  }
+  .video-card:hover { border-color: var(--accent); background: var(--bg-card-hover); }
+  .video-thumb {
+    width: 100%; aspect-ratio: 16/9; border-radius: 6px;
+    background: var(--bg-card); margin-bottom: 10px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .video-thumb .play {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(0,191,165,0.9); display: flex;
+    align-items: center; justify-content: center;
+    transition: transform 0.3s;
+  }
+  .video-card:hover .play { transform: scale(1.15); }
+  .video-thumb .duration {
+    position: absolute; bottom: 6px; right: 6px;
+    background: rgba(0,0,0,0.7); padding: 2px 6px;
+    border-radius: 4px; font-size: 0.7rem; font-family: 'JetBrains Mono', monospace;
+  }
+  .video-title { font-size: 0.82rem; font-weight: 500; line-height: 1.3; }
+
+  /* Path selector */
+  .path-selector { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 1.5rem; }
+  .path-btn {
+    padding: 16px; border-radius: 12px; border: 2px solid var(--border);
+    background: var(--bg-secondary); cursor: pointer; transition: all 0.3s;
+    text-align: center;
+  }
+  .path-btn:hover { border-color: var(--border-light); background: var(--bg-card-hover); }
+  .path-btn.active { border-color: var(--accent); background: var(--accent-glow); }
+  .path-btn .path-icon { font-size: 1.8rem; margin-bottom: 8px; }
+  .path-btn .path-label { font-size: 0.85rem; font-weight: 600; }
+  .path-btn .path-desc { font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; }
+
+  .path-content { display: none; }
+  .path-content.active { display: block; }
+
+  .setup-step {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px; border-radius: 8px;
+    background: var(--bg-secondary); border: 1px solid var(--border);
+    margin-bottom: 8px; cursor: pointer; transition: all 0.3s;
+  }
+  .setup-step:hover { border-color: var(--accent); background: var(--bg-card-hover); }
+  .setup-step.done { border-color: var(--success); opacity: 0.7; }
+  .setup-step .step-num {
+    width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+    background: var(--bg-card); border: 1px solid var(--border-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: 600; color: var(--accent-light);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .setup-step.done .step-num { background: var(--success); border-color: var(--success); color: #fff; }
+  .setup-step .step-label { font-size: 0.82rem; font-weight: 500; }
+
+  .section-divider {
+    font-size: 0.7rem; font-weight: 600; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 1.5px;
+    margin: 16px 0 10px; padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Setup step active state */
+  .setup-step.active {
+    border-color: var(--accent);
+    background: var(--accent-glow);
+  }
+  .setup-step.active .step-num {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  /* Step detail panels */
+  .step-detail {
+    display: none;
+    animation: fadeSlideIn 0.3s ease;
+  }
+  .step-detail.active { display: block; }
+  .step-detail-placeholder { display: block; }
+  .step-detail-placeholder.hidden { display: none; }
+
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .step-detail-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.2rem;
+  }
+  .step-detail-card h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+    color: var(--accent-light);
+  }
+  .step-detail-card p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  /* ---- FLOATING PROGRESS WIDGET ---- */
+  .progress-widget {
+    position: fixed;
+    bottom: 2rem;
+    left: 2rem;
+    z-index: 150;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+  }
+  .progress-widget.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .widget-toggle {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    cursor: pointer; position: relative;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+  .widget-toggle:hover {
+    border-color: var(--accent);
+    box-shadow: 0 4px 24px rgba(0,191,165,0.2);
+  }
+  .widget-toggle svg {
+    width: 48px; height: 48px;
+  }
+  .widget-toggle .toggle-pct {
+    position: absolute;
+    font-size: 0.65rem;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent-light);
+  }
+
+  .widget-panel {
+    position: absolute;
+    bottom: 68px;
+    left: 0;
+    width: 260px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+  }
+  .widget-panel::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    border-radius: 16px 16px 0 0;
+    background: linear-gradient(90deg, var(--accent-dark), var(--accent), var(--accent-light));
+  }
+  .widget-panel::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 20px;
+    width: 12px; height: 12px;
+    background: var(--bg-card);
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    transform: rotate(45deg);
+  }
+  .widget-panel.open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+
+  .widget-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+  }
+
+  .widget-ring-wrap {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .widget-ring {
+    width: 64px; height: 64px; flex-shrink: 0;
+  }
+  .widget-ring circle {
+    fill: none; stroke-width: 6; stroke-linecap: round;
+  }
+  .widget-ring .bg { stroke: var(--border); }
+  .widget-ring .fill {
+    stroke: var(--accent);
+    stroke-dasharray: 175.929;
+    transform: rotate(-90deg); transform-origin: center;
+    transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .widget-pct {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1;
+  }
+  .widget-pct-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .widget-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .widget-step-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+  .widget-step-row:hover {
+    background: var(--bg-secondary);
+  }
+  .widget-step-row.done {
+    color: var(--accent-light);
+  }
+  .widget-step-dot {
+    width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0;
+    border: 2px solid var(--border-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.55rem; color: transparent;
+    transition: all 0.3s;
+  }
+  .widget-step-row.done .widget-step-dot {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .widget-step-row.current .widget-step-dot {
+    border-color: var(--accent);
+    box-shadow: 0 0 6px var(--accent-glow-strong);
+  }
+
+  /* Celebrate animation */
+  @keyframes celebrate {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.15); }
+    60% { transform: scale(0.95); }
+    100% { transform: scale(1); }
+  }
+  .progress-widget.celebrate .widget-toggle {
+    animation: celebrate 0.5s ease;
+    border-color: var(--accent);
+    box-shadow: 0 0 20px rgba(0,191,165,0.4);
+  }
+
+  /* Confetti */
+  .confetti-container {
+    position: fixed;
+    bottom: 2rem;
+    left: 2rem;
+    width: 56px;
+    height: 56px;
+    pointer-events: none;
+    z-index: 160;
+  }
+  .confetti-piece {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    bottom: 28px;
+    left: 28px;
+    opacity: 1;
+    border-radius: 2px;
+    animation: confetti-burst var(--duration) cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  }
+  .confetti-piece.circle { border-radius: 50%; }
+  .confetti-piece.rect { width: 5px; height: 12px; border-radius: 1px; }
+  .confetti-piece.star { border-radius: 0; clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); width: 10px; height: 10px; }
+
+  @keyframes confetti-burst {
+    0% {
+      transform: translate(0, 0) rotate(0deg) scale(1);
+      opacity: 1;
+    }
+    20% {
+      opacity: 1;
+    }
+    100% {
+      transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(0.3);
+      opacity: 0;
+    }
+  }
+
+  /* ---- CTA SECTION ---- */
+  .cta-section {
+    position: relative; z-index: 1;
+    padding: 6rem 2rem; text-align: center;
+  }
+  .cta-box {
+    max-width: 600px; margin: 0 auto; padding: 3rem;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 20px; position: relative; overflow: hidden;
+  }
+  .cta-box::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent-dark), var(--accent), var(--accent-light));
+  }
+  .cta-box h2 { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.8rem; letter-spacing: -0.5px; }
+  .cta-box p { color: var(--text-secondary); margin-bottom: 2rem; }
+
+  /* Completion celebration overlay */
+  .celebration-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(11, 18, 25, 0.92);
+    backdrop-filter: blur(12px);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.6s ease;
+  }
+  .celebration-overlay.visible {
+    opacity: 1; pointer-events: all;
+  }
+  .celebration-content {
+    text-align: center; max-width: 520px; padding: 2rem;
+    position: relative;
+  }
+  .robot-container {
+    width: 160px; height: 160px; margin: 0 auto 1.5rem;
+    position: relative;
+    animation: robotPop 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    opacity: 0; transform: scale(0.3) translateY(60px);
+  }
+  .celebration-overlay.visible .robot-container {
+    opacity: 1; transform: scale(1) translateY(0);
+  }
+  @keyframes robotPop {
+    0% { opacity: 0; transform: scale(0.3) translateY(60px); }
+    60% { opacity: 1; transform: scale(1.1) translateY(-10px); }
+    80% { transform: scale(0.95) translateY(2px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  @keyframes robotWave {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(15deg); }
+    75% { transform: rotate(-10deg); }
+  }
+  @keyframes robotFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  .robot-container svg {
+    width: 100%; height: 100%;
+    animation: robotFloat 3s ease-in-out infinite;
+    animation-delay: 0.8s;
+  }
+  .robot-arm-right {
+    animation: robotWave 1.2s ease-in-out infinite;
+    animation-delay: 0.8s;
+    transform-origin: 85px 100px;
+  }
+  .celebration-title {
+    font-size: 2rem; font-weight: 800; margin-bottom: 0.6rem;
+    background: linear-gradient(135deg, var(--accent-light), var(--accent), #45D1B8);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    opacity: 0; transform: translateY(16px);
+    transition: all 0.6s ease 0.4s;
+  }
+  .celebration-overlay.visible .celebration-title {
+    opacity: 1; transform: translateY(0);
+  }
+  .celebration-subtitle {
+    color: var(--text-secondary); font-size: 1.05rem; line-height: 1.7;
+    margin-bottom: 2rem;
+    opacity: 0; transform: translateY(16px);
+    transition: all 0.6s ease 0.6s;
+  }
+  .celebration-overlay.visible .celebration-subtitle {
+    opacity: 1; transform: translateY(0);
+  }
+  .celebration-actions {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    opacity: 0; transform: translateY(16px);
+    transition: all 0.6s ease 0.8s;
+  }
+  .celebration-overlay.visible .celebration-actions {
+    opacity: 1; transform: translateY(0);
+  }
+  .btn-book {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 14px 32px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-light));
+    color: #fff; font-weight: 700; font-size: 1.05rem;
+    border: none; cursor: pointer;
+    box-shadow: 0 4px 24px rgba(0, 191, 165, 0.35);
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+  .btn-book:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0, 191, 165, 0.5);
+  }
+  .btn-book svg { width: 20px; height: 20px; }
+  .celebration-dismiss {
+    color: var(--text-muted); font-size: 0.85rem;
+    cursor: pointer; border: none; background: none;
+    padding: 8px 16px; transition: color 0.3s;
+  }
+  .celebration-dismiss:hover { color: var(--text-primary); }
+  .celebration-sparkles {
+    position: absolute; inset: -40px; pointer-events: none; overflow: hidden;
+  }
+  .sparkle {
+    position: absolute; width: 4px; height: 4px;
+    background: var(--accent-light); border-radius: 50%;
+    animation: sparkleFloat 2s ease-in-out infinite;
+  }
+  @keyframes sparkleFloat {
+    0%, 100% { opacity: 0; transform: translateY(0) scale(0); }
+    50% { opacity: 1; transform: translateY(-20px) scale(1); }
+  }
+
+  /* ---- FOOTER ---- */
+  footer {
+    position: relative; z-index: 1;
+    border-top: 1px solid var(--border);
+    padding: 2rem; text-align: center;
+    color: var(--text-muted); font-size: 0.8rem;
+  }
+
+  /* ---- RESPONSIVE ---- */
+  @media (max-width: 768px) {
+    .step-inner { grid-template-columns: 1fr; gap: 2rem; }
+    .step-section:nth-child(odd) .step-inner { direction: ltr; }
+    .hero h1 { font-size: 2.2rem; }
+    .video-grid { grid-template-columns: 1fr; }
+    .progress-widget { bottom: 1rem; left: 1rem; }
+    .widget-panel { width: 230px; }
+    .path-selector { grid-template-columns: 1fr; }
+  }
+
+  /* Success toast */
+  .toast {
+    position: fixed; bottom: 2rem; right: 2rem; z-index: 200;
+    padding: 14px 24px; border-radius: 12px;
+    background: var(--bg-card); border: 1px solid var(--success);
+    color: var(--text-primary); font-size: 0.9rem;
+    display: flex; align-items: center; gap: 10px;
+    transform: translateY(100px); opacity: 0;
+    transition: all 0.4s;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast .toast-icon { color: var(--success); font-size: 1.1rem; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="logo">imnoo</div>
+    <div class="nav-progress" id="navProgress">
+      <div class="nav-dot" data-step="1" onclick="scrollToStep(1)"></div><div class="nav-line"></div>
+      <div class="nav-dot" data-step="2" onclick="scrollToStep(2)"></div><div class="nav-line"></div>
+      <div class="nav-dot" data-step="3" onclick="scrollToStep(3)"></div><div class="nav-line"></div>
+      <div class="nav-dot" data-step="4" onclick="scrollToStep(4)"></div><div class="nav-line"></div>
+      <div class="nav-dot" data-step="5" onclick="scrollToStep(5)"></div>
+    </div>
+    <div style="font-size:0.8rem; color:var(--text-muted)">
+      <span id="progressLabel">Step 0 / 5</span>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <div class="hero-badge"><span class="pulse"></span> Onboarding Portal</div>
+    <h1>Get started with the <span class="gradient">Imnoo Onboarding</span></h1>
+    <p>Welcome to imnoo. In five simple steps, we'll configure your platform for accurate CNC time estimation and quoting. Let's set you up for success.</p>
+    <button class="hero-cta" onclick="scrollToStep(1)">
+      Begin Setup
+      <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"/></svg>
+    </button>
+  </div>
+  <div class="scroll-hint">
+    <span>Scroll to explore</span>
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 12l-4-4h8z"/></svg>
+  </div>
+</section>
+
+<!-- STEP 1: Account Creation -->
+<section class="step-section" id="step1" data-step="1">
+  <div class="step-inner">
+    <div class="step-info">
+      <div class="step-number">Step 01 / 05</div>
+      <h2>Create new or login to existing Imnoo Account</h2>
+      <p>This is your first step to your brand new AI based CNC calculation tool. Sign in to unlock intelligent time estimation, automated quoting, and a smarter way to run your manufacturing business.</p>
+    </div>
+    <div class="step-card" style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:280px; text-align:center;">
+      <div style="font-size:3rem; margin-bottom:1rem;">&#128272;</div>
+      <h3 style="font-size:1.1rem; margin-bottom:0.6rem; font-weight:600;">Account Setup</h3>
+      <p style="font-size:0.88rem; color:var(--text-secondary); margin-bottom:1.5rem; max-width:320px;">Click below to create your imnoo account or sign in to your existing workspace.</p>
+      <a href="https://login.imnoo.com/login" target="_blank" class="btn btn-primary" style="width:100%; max-width:300px; justify-content:center; text-decoration:none;" onclick="completeStep(1)">Go to imnoo Login &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<!-- STEP 2: Needs Analysis -->
+<section class="step-section" id="step2" data-step="2">
+  <div class="step-inner">
+    <div class="step-info">
+      <div class="step-number">Step 02 / 05</div>
+      <h2>Tell us about your process</h2>
+      <p>Help us understand your current quoting workflow and CNC data landscape. This allows us to pre-configure your platform for maximum impact from day one.</p>
+    </div>
+    <div class="step-card">
+      <h3 style="font-size:1.1rem; margin-bottom:1.2rem; font-weight:600;">Process Questionnaire</h3>
+      <div class="form-group">
+        <label class="form-label">Current quoting method</label>
+        <select class="form-select">
+          <option value="">Select method</option>
+          <option>Manual calculation</option>
+          <option>Excel / Spreadsheets</option>
+          <option>ERP-integrated</option>
+          <option>Specialized software</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Available time data</label>
+        <select class="form-select">
+          <option value="">What data do you track?</option>
+          <option>Machine times only</option>
+          <option>Machine + Setup times</option>
+          <option>Machine + Setup + Programming times</option>
+          <option>No structured data yet</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Which ERP system do you use?</label>
+        <select class="form-select" id="erpSelect" onchange="toggleErpOther()">
+          <option value="">Select ERP</option>
+          <option>SAP</option>
+          <option>Microsoft Dynamics</option>
+          <option>Abas</option>
+          <option>proAlpha</option>
+          <option value="Other">Other</option>
+          <option>No ERP in use</option>
+        </select>
+        <input class="form-input" id="erpOther" type="text" placeholder="Please specify your ERP system..." style="display:none; margin-top:8px;">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Biggest pain point</label>
+        <textarea class="form-textarea" placeholder="e.g. Quotes take too long, inconsistent pricing, missing data..."></textarea>
+      </div>
+      <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="completeStep(2)">Submit Questionnaire &rarr;</button>
+    </div>
+  </div>
+</section>
+
+<!-- STEP 3: Goals -->
+<section class="step-section" id="step3" data-step="3" style="min-height:auto; padding:6rem 2rem;">
+  <div style="max-width:1100px; width:100%;">
+    <div style="text-align:center; margin-bottom:3rem;">
+      <div class="step-number" style="margin-bottom:0.8rem;">Step 03 / 05</div>
+      <h2 style="font-size:2rem; font-weight:700; letter-spacing:-0.5px; margin-bottom:0.8rem;">Define your goals</h2>
+      <p style="color:var(--text-secondary); max-width:600px; margin:0 auto;">We'd love to understand what you want to achieve with imnoo. Select how you plan to use the platform, then set your individual targets so we can measure your success together.</p>
+    </div>
+
+    <!-- Use case selector -->
+    <div class="section-divider" style="max-width:700px; margin:0 auto 12px;">What do you want to use imnoo for?</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; max-width:700px; margin:0 auto 2rem;">
+      <div class="path-btn" id="goal-similarity" onclick="selectGoalPath('similarity')">
+        <div class="path-icon">&#128269;</div>
+        <div class="path-label">Similarity Search</div>
+        <div class="path-desc">Find similar parts from your existing database</div>
+      </div>
+      <div class="path-btn" id="goal-estimation" onclick="selectGoalPath('estimation')">
+        <div class="path-icon">&#9202;</div>
+        <div class="path-label">Time Estimations</div>
+        <div class="path-desc">Generate CNC time estimates for parts</div>
+      </div>
+      <div class="path-btn" id="goal-quotation" onclick="selectGoalPath('quotation')">
+        <div class="path-icon">&#128196;</div>
+        <div class="path-label">Quotations</div>
+        <div class="path-desc">Create quotes with manufacturing plans & prices</div>
+      </div>
+    </div>
+
+    <!-- Goal panels -->
+    <div style="max-width:700px; margin:0 auto;">
+
+      <!-- Similarity Search Goals -->
+      <div class="path-content" id="goals-similarity">
+        <div class="step-card">
+          <h3 style="font-size:1rem; margin-bottom:1rem; font-weight:600;">Your Similarity Search Goals</h3>
+          <div class="milestone-grid">
+            <div class="milestone-item" onclick="toggleMilestone(this)">
+              <div class="milestone-check">&#10003;</div>
+              <div class="milestone-text">Find similar parts faster<small>Quickly locate matching parts from your existing database</small></div>
+            </div>
+            <div class="milestone-item" onclick="toggleMilestone(this)">
+              <div class="milestone-check">&#10003;</div>
+              <div class="milestone-text">Digital archive of all produced articles<small>Build a searchable database of all manufactured parts</small></div>
+            </div>
+            <div style="margin-top:8px;">
+              <label class="form-label">Custom goal</label>
+              <input class="form-input" type="text" placeholder="Describe your own goal...">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estimation Goals -->
+      <div class="path-content" id="goals-estimation">
+        <div class="step-card">
+          <h3 style="font-size:1rem; margin-bottom:1rem; font-weight:600;">Your Time Estimation Goals</h3>
+          <div class="milestone-grid">
+            <div class="milestone-item" onclick="toggleMilestone(this); toggleSubInput(this, 'est-time-pct')">
+              <div class="milestone-check">&#10003;</div>
+              <div class="milestone-text">Reduce time for estimations<small>Speed up your estimation process</small></div>
+            </div>
+            <div id="est-time-pct" style="display:none; padding:0 0 8px 38px;">
+              <label class="form-label" style="margin-top:4px;">By what % do you want to reduce estimation time?</label>
+              <input class="form-input" type="number" placeholder="e.g. 50" min="1" max="100" style="max-width:200px;">
+            </div>
+            <div class="milestone-item" onclick="toggleMilestone(this); toggleSubInput(this, 'est-acc-pct')">
+              <div class="milestone-check">&#10003;</div>
+              <div class="milestone-text">Achieve more accurate estimations<small>Improve precision of your time estimates</small></div>
+            </div>
+            <div id="est-acc-pct" style="display:none; padding:0 0 8px 38px;">
+              <label class="form-label" style="margin-top:4px;">What accuracy (%) do you expect?</label>
+              <input class="form-input" type="number" placeholder="e.g. 90" min="1" max="100" style="max-width:200px;">
+            </div>
+            <div style="margin-top:8px;">
+              <label class="form-label">Custom goal</label>
+              <input class="form-input" type="text" placeholder="Describe your own goal...">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quotation Goals -->
+      <div class="path-content" id="goals-quotation">
+        <div class="step-card">
+          <h3 style="font-size:1rem; margin-bottom:1rem; font-weight:600;">Your Quotation Goals</h3>
+          <div class="milestone-grid">
+            <div class="milestone-item" onclick="toggleMilestone(this); toggleSubInput(this, 'qt-time-pct')">
+              <div class="milestone-check">&#10003;</div>
+              <div class="milestone-text">Reduce quoting time<small>Create quotes faster with automated workflows</small></div>
+            </div>
+            <div id="qt-time-pct" style="display:none; padding:0 0 8px 38px;">
+              <label class="form-label" style="margin-top:4px;">By what % do you want to reduce quoting time?</label>
+              <input class="form-input" type="number" placeholder="e.g. 40" min="1" max="100" style="max-width:200px;">
+            </div>
+            <div class="milestone-item" onclick="toggleMilestone(this); toggleSubInput(this, 'qt-vol-pct')">
+              <div class="milestone-check">&#10003;</div>
+              <div class="milestone-text">Increase quote volume<small>Handle more quote requests with the same team</small></div>
+            </div>
+            <div id="qt-vol-pct" style="display:none; padding:0 0 8px 38px;">
+              <label class="form-label" style="margin-top:4px;">By what % do you want to increase volume?</label>
+              <input class="form-input" type="number" placeholder="e.g. 30" min="1" max="100" style="max-width:200px;">
+            </div>
+            <div class="milestone-item" onclick="toggleMilestone(this)">
+              <div class="milestone-check">&#10003;</div>
+              <div class="milestone-text">Standardize manufacturing plans<small>Consistent, professional quotes for every customer</small></div>
+            </div>
+            <div style="margin-top:8px;">
+              <label class="form-label">Custom goal</label>
+              <input class="form-input" type="text" placeholder="Describe your own goal...">
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <button class="btn btn-primary" style="width:100%; max-width:400px; justify-content:center; margin:2rem auto 0; display:flex;" onclick="completeStep(3)">Confirm Goals &rarr;</button>
+  </div>
+</section>
+
+<!-- STEP 4: Platform Setup Paths -->
+<section class="step-section" id="step4" data-step="4" style="min-height:auto; padding:6rem 2rem;">
+  <div style="max-width:1100px; width:100%;">
+    <div style="text-align:center; margin-bottom:3rem;">
+      <div class="step-number" style="margin-bottom:0.8rem;">Step 04 / 05</div>
+      <h2 style="font-size:2rem; font-weight:700; letter-spacing:-0.5px; margin-bottom:0.8rem;">Setup your Imnoo Account</h2>
+      <p style="color:var(--text-secondary); max-width:600px; margin:0 auto;">Based on your goals, we've pre-selected the right setup path for you. Follow the steps and tutorials below to get started.</p>
+    </div>
+
+    <!-- Path Selector -->
+    <div class="path-selector">
+      <div class="path-btn" id="s4-similarity" onclick="switchPath('similarity')">
+        <div class="path-icon">&#128269;</div>
+        <div class="path-label">Similarity Search</div>
+        <div class="path-desc">Set up your parts database for fast search</div>
+      </div>
+      <div class="path-btn" id="s4-estimation" onclick="switchPath('estimation')">
+        <div class="path-icon">&#9202;</div>
+        <div class="path-label">Time Estimation</div>
+        <div class="path-desc">Set up AI-powered CNC time estimation</div>
+      </div>
+      <div class="path-btn" id="s4-quotes" onclick="switchPath('quotes')">
+        <div class="path-icon">&#128196;</div>
+        <div class="path-label">Quotations</div>
+        <div class="path-desc">Configure everything to create professional quotes</div>
+      </div>
+    </div>
+
+    <!-- PATH: Similarity Search Setup -->
+    <div class="path-content" id="path-similarity">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:2rem;">
+        <div>
+          <div class="section-divider">Setup Steps &middot; 2 items</div>
+          <div class="setup-step" data-detail="sim-1" onclick="selectSetupStep(this, 'similarity')">
+            <div class="step-num">1</div>
+            <div class="step-label">Import your existing parts database</div>
+          </div>
+          <div class="setup-step" data-detail="sim-2" onclick="selectSetupStep(this, 'similarity')">
+            <div class="step-num">2</div>
+            <div class="step-label">Configure search parameters & filters</div>
+          </div>
+        </div>
+        <div>
+          <div class="section-divider">Step Details</div>
+          <div class="step-detail-placeholder" id="sim-placeholder">
+            <p style="color:var(--text-muted); font-size:0.88rem; text-align:center; padding:2rem 1rem;">Click a setup step on the left to see its description and tutorial video.</p>
+          </div>
+          <div class="step-detail" id="detail-sim-1">
+            <div class="step-detail-card">
+              <h4>Import your existing parts database</h4>
+              <p>Upload your historical production data so imnoo can learn from your past work. Supported formats include CSV, Excel, and direct ERP exports. The more data you provide, the smarter your AI estimations become.</p>
+              <div class="video-card" onclick="playVideo(this)" style="margin-top:12px;">
+                <div class="video-thumb"><div class="play"><svg width="14" height="14" viewBox="0 0 14 14" fill="white"><path d="M3 1l10 6-10 6z"/></svg></div><span class="duration">5:20</span></div>
+                <div class="video-title">Bulk Import &mdash; Upload Your Production Data</div>
+              </div>
+            </div>
+          </div>
+          <div class="step-detail" id="detail-sim-2">
+            <div class="step-detail-card">
+              <h4>Configure search parameters & filters</h4>
+              <p>Define which attributes matter most for your similarity searches: material, dimensions, tolerances, complexity, and more. Fine-tune the matching algorithm to find the most relevant parts from your archive.</p>
+              <div class="video-card" onclick="playVideo(this)" style="margin-top:12px;">
+                <div class="video-thumb"><div class="play"><svg width="14" height="14" viewBox="0 0 14 14" fill="white"><path d="M3 1l10 6-10 6z"/></svg></div><span class="duration">4:35</span></div>
+                <div class="video-title">Time Estimation & Similarity Search</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PATH: Quoting Setup -->
+    <div class="path-content" id="path-quotes">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:2rem;">
+        <div>
+          <div class="section-divider">Setup Steps &middot; 10 items</div>
+          <div class="setup-step" data-detail="qt-1" onclick="selectSetupStep(this, 'quotes')"><div class="step-num">1</div><div class="step-label">Settings &mdash; Choose your currency</div></div>
+          <div class="setup-step" data-detail="qt-2" onclick="selectSetupStep(this, 'quotes')"><div class="step-num">2</div><div class="step-label">Contacts &mdash; Add your customers</div></div>
+          <div class="setup-step" data-detail="qt-3" onclick="selectSetupStep(this, 'quotes')"><div class="step-num">3</div><div class="step-label">Add your machines</div></div>
+          <div class="setup-step" data-detail="qt-4" onclick="selectSetupStep(this, 'quotes')"><div class="step-num">4</div><div class="step-label">Materials & supplier database</div></div>
+          <div class="setup-step" data-detail="qt-5" onclick="selectSetupStep(this, 'quotes')"><div class="step-num">5</div><div class="step-label">Add custom materials</div></div>
+          <div class="setup-step" data-detail="qt-6" onclick="selectSetupStep(this, 'quotes')"><div class="step-num">6</div><div class="step-label">Create internal manufacturing steps</div></div>
+          <div class="setup-step" data-detail="qt-7" onclick="selectSetupStep(this, 'quotes')"><div class="step-num">7</div><div class="step-label">Create external manufacturing steps</div></div>
+          <div class="setup-step" data-detail="qt-8" onclick="selectSetupStep(this, 'quotes')"><div class="step-num">8</div><div class="step-label">Autoquote & webshop settings</div></div>
+          <div class="setup-step" data-detail="qt-9" onclick="selectSetupStep(this, 'quotes')"><div class="step-num">9</div><div class="step-label">Delivery & calculation settings</div></div>
+          <div class="setup-step" data-detail="qt-10" onclick="selectSetupStep(this, 'quotes')"><div class="step-num">10</div><div class="step-label">Payment information</div></div>
+        </div>
+        <div>
+          <div class="section-divider">Step Details</div>
+          <div class="step-detail-placeholder" id="qt-placeholder">
+            <p style="color:var(--text-muted); font-size:0.88rem; text-align:center; padding:2rem 1rem;">Click a setup step on the left to see its description and tutorial video.</p>
+          </div>
+          <div class="step-detail" id="detail-qt-1">
+            <div class="step-detail-card">
+              <h4>Settings &mdash; Choose your currency</h4>
+              <p>Set your default currency for all quotations. This ensures consistent pricing across your team and is reflected in all exported quotes and reports.</p>
+              <div class="video-card" onclick="playVideo(this)" style="margin-top:12px;">
+                <div class="video-thumb"><div class="play"><svg width="14" height="14" viewBox="0 0 14 14" fill="white"><path d="M3 1l10 6-10 6z"/></svg></div><span class="duration">2:15</span></div>
+                <div class="video-title">General Settings &amp; Currency Configuration</div>
+              </div>
+            </div>
+          </div>
+          <div class="step-detail" id="detail-qt-2">
+            <div class="step-detail-card">
+              <h4>Contacts &mdash; Add your customers</h4>
+              <p>Import or manually add your customer contacts. Link them to quotations for seamless tracking and a professional, personalized quoting experience.</p>
+              <div class="video-card" onclick="playVideo(this)" style="margin-top:12px;">
+                <div class="video-thumb"><div class="play"><svg width="14" height="14" viewBox="0 0 14 14" fill="white"><path d="M3 1l10 6-10 6z"/></svg></div><span class="duration">3:10</span></div>
+                <div class="video-title">Managing Contacts &amp; Customers</div>
+              </div>
+            </div>
+          </div>
+          <div class="step-detail" id="detail-qt-3">
+            <div class="step-detail-card">
+              <h4>Add your machines</h4>
+              <p>Register your CNC machines with their specifications, hourly rates, and capabilities. This data powers accurate time estimations and cost calculations for every quote.</p>
+              <div class="video-card" onclick="playVideo(this)" style="margin-top:12px;">
+                <div class="video-thumb"><div class="play"><svg width="14" height="14" viewBox="0 0 14 14" fill="white"><path d="M3 1l10 6-10 6z"/></svg></div><span class="duration">5:03</span></div>
+                <div class="video-title">Import &amp; Manage Machine Data</div>
+              </div>
+            </div>
+          </div>
+          <div class="step-detail" id="detail-qt-4">
+            <div class="step-detail-card">
+              <h4>Materials & supplier database</h4>
+              <p>Set up your materials library with supplier pricing. imnoo automatically calculates material costs based on part dimensions and your configured prices per kilogram or unit.</p>
+              <div class="video-card" onclick="playVideo(this)" style="margin-top:12px;">
+                <div class="video-thumb"><div class="play"><svg width="14" height="14" viewBox="0 0 14 14" fill="white"><path d="M3 1l10 6-10 6z"/></svg></div><span class="duration">4:20</span></div>
+                <div class="video-title">Materials &amp; Supplier Setup</div>
+              </div>
+            </div>
+          </div>
+          <div class="step-detail" id="detail-qt-5">
+            <div class="step-detail-card">
+              <h4>Add custom materials</h4>
+              <p>Define special or proprietary materials that aren't in the standard database. Set custom pricing, density, and machining parameters for accurate cost calculations.</p>
+              <div class="video-card" onclick="playVideo(this)" style="margin-top:12px;">
+                <div class="video-thumb"><div class="play"><svg width="14" height="14" viewBox="0 0 14 14" fill="white"><path d="M3 1l10 6-10 6z"/></svg></div><span class="duration">3:05</span></div>
+                <div class="video-title">Custom Materials Configuration</div>
+              </div>
+            </div>
+          </div>
+          <div class="step-detail" id="detail-qt-6">
+            <div class="step-detail-card">
+              <h4>Create internal manufacturing steps</h4>
+              <p>Define your in-house production steps like milling, turning, grinding, deburring, and quality inspection. Assign time estimates and costs to each step for detailed manufacturing plans.</p>
+              <div class="video-card" onclick="playVideo(this)" style="margin-top:12px;">
+                <div class="video-thumb"><div class="play"><svg width="14" height="14" viewBox="0 0 14 14" fill="white"><path d="M3 1l10 6-10 6z"/></svg></div><span class="duration">4:45</span></div>
+                <div class="video-title">Internal Manufacturing Steps</div>
+              </div>
+            </div>
+          </div>
+          <div class="step-detail" id="detail-qt-7">
+            <div class="step-detail-card">
+              <h4>Create external manufacturing steps</h4>
+              <p>Set up outsourced operations like heat treatment, surface coating, or anodizing. Include supplier pricing and lead times so they're automatically factored into your quotes.</p>
+              <div class="video-card" onclick="playVideo(this)" style="margin-top:12px;">
+                <div class="video-thumb"><div class="play"><svg width="14" height="14" viewBox="0 0 14 14" fill="white"><path d="M3 1l10 6-10 6z"/></svg></div><span class="duration">3:30</span></div>
+                <div class="video-title">External Manufacturing Steps</div>
+              </div>
+            </div>
+          </div>
+          <div class="step-detail" id="detail-qt-8">
+            <div class="step-detail-card">
+              <h4>Autoquote & webshop settings</h4>
+              <p>Configure automatic quoting rules for standard parts. Set up your webshop integration so customers can receive instant quotes for parts that match your predefined criteria.</p>
+              <div class="video-card" onclick="playVideo(this)" style="margin-top:12px;">
+                <div class="video-thumb"><div class="play"><svg width="14" height="14" viewBox="0 0 14 14" fill="white"><path d="M3 1l10 6-10 6z"/></svg></div><span class="duration">5:10</span></div>
+                <div class="video-title">Autoquote &amp; Webshop Setup</div>
+              </div>
+            </div>
+          </div>
+          <div class="step-detail" id="detail-qt-9">
+            <div class="step-detail-card">
+              <h4>Delivery & calculation settings</h4>
+              <p>Define delivery terms, lead time calculations, and pricing formulas. Set up surcharges for rush orders, minimum order values, and quantity-based discount tiers.</p>
+              <div class="video-card" onclick="playVideo(this)" style="margin-top:12px;">
+                <div class="video-thumb"><div class="play"><svg width="14" height="14" viewBox="0 0 14 14" fill="white"><path d="M3 1l10 6-10 6z"/></svg></div><span class="duration">3:50</span></div>
+                <div class="video-title">Delivery &amp; Calculation Settings</div>
+              </div>
+            </div>
+          </div>
+          <div class="step-detail" id="detail-qt-10">
+            <div class="step-detail-card">
+              <h4>Payment information</h4>
+              <p>Enter your bank details, payment terms, and VAT information. These details are automatically included on all generated quotations and invoices.</p>
+              <div class="video-card" onclick="playVideo(this)" style="margin-top:12px;">
+                <div class="video-thumb"><div class="play"><svg width="14" height="14" viewBox="0 0 14 14" fill="white"><path d="M3 1l10 6-10 6z"/></svg></div><span class="duration">2:40</span></div>
+                <div class="video-title">Payment &amp; Invoice Settings</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PATH: Time Estimation Setup -->
+    <div class="path-content" id="path-estimation">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:2rem;">
+        <div>
+          <div class="section-divider">Setup Steps &middot; 2 items</div>
+          <div class="setup-step" data-detail="est-1" onclick="selectSetupStep(this, 'estimation')">
+            <div class="step-num">1</div>
+            <div class="step-label">Account setup</div>
+          </div>
+          <div class="setup-step" data-detail="est-2" onclick="selectSetupStep(this, 'estimation')">
+            <div class="step-num">2</div>
+            <div class="step-label">Setup for Estimations</div>
+          </div>
+        </div>
+        <div>
+          <div class="section-divider">Step Details</div>
+          <div class="step-detail-placeholder" id="est-placeholder">
+            <p style="color:var(--text-muted); font-size:0.88rem; text-align:center; padding:2rem 1rem;">Click a setup step on the left to see its description and tutorial video.</p>
+          </div>
+          <div class="step-detail" id="detail-est-1">
+            <div class="step-detail-card">
+              <h4>Account setup</h4>
+              <p>Configure your imnoo account settings, add your company details, and set up your team members. This is the foundation for all your AI-powered time estimations.</p>
+              <div class="video-card" onclick="playVideo(this)" style="margin-top:12px;">
+                <div class="video-thumb"><div class="play"><svg width="14" height="14" viewBox="0 0 14 14" fill="white"><path d="M3 1l10 6-10 6z"/></svg></div><span class="duration">5:03</span></div>
+                <div class="video-title">Import &amp; Manage Machine Data</div>
+              </div>
+            </div>
+          </div>
+          <div class="step-detail" id="detail-est-2">
+            <div class="step-detail-card">
+              <h4>Settings for the first Time Estimation</h4>
+              <p style="margin-bottom:1rem;">Set up your account for a first time estimation — add machines, configure manufacturing steps, and prepare for estimations.</p>
+
+              <!-- Loom video — click thumbnail to load player inline -->
+              <div id="loom-est-wrapper" style="position:relative; border-radius:10px; overflow:hidden; margin-bottom:1.2rem; border:1px solid var(--border); background:#0b1219; aspect-ratio:16/9; cursor:pointer; transition:border-color 0.3s;" onclick="loadLoomVideo(this)" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+                <!-- Thumbnail -->
+                <img src="https://cdn.loom.com/sessions/thumbnails/87c7cf0a41104b70ae520d3a573c17ea-with-play.gif" alt="Settings for the first Time Estimation" style="width:100%; height:100%; object-fit:cover; opacity:0.85; transition:opacity 0.3s;" onerror="this.style.display='none'">
+                <!-- Play button overlay -->
+                <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; background:rgba(0,0,0,0.25);">
+                  <div style="width:60px; height:60px; border-radius:50%; background:rgba(0,191,165,0.92); display:flex; align-items:center; justify-content:center; box-shadow:0 4px 24px rgba(0,0,0,0.5); backdrop-filter:blur(4px); transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                    <svg width="24" height="24" viewBox="0 0 14 14" fill="white"><path d="M3 1l10 6-10 6z"/></svg>
+                  </div>
+                  <span style="color:#fff; font-size:0.8rem; text-shadow:0 1px 4px rgba(0,0,0,0.6);">Click to play (2:18)</span>
+                </div>
+                <!-- Duration badge -->
+                <div style="position:absolute; bottom:8px; right:8px; background:rgba(0,0,0,0.7); color:#fff; font-size:0.72rem; padding:2px 8px; border-radius:4px;">2:18</div>
+              </div>
+
+              <div style="font-size:0.84rem; color:var(--text-secondary); line-height:1.75;">
+                <div style="font-weight:600; color:var(--accent-light); margin-bottom:0.5rem;">Step-by-step guide:</div>
+                <div style="display:flex; gap:8px; margin-bottom:6px;"><span style="color:var(--accent); font-weight:700; min-width:18px;">1.</span><span>Go to <strong>Settings</strong> and select <strong>Machines</strong> to begin adding your machine.</span></div>
+                <div style="display:flex; gap:8px; margin-bottom:6px;"><span style="color:var(--accent); font-weight:700; min-width:18px;">2.</span><span>Choose a machine brand &amp; model. If not listed, add a new one and specify the type (e.g. Milling, Turning).</span></div>
+                <div style="display:flex; gap:8px; margin-bottom:6px;"><span style="color:var(--accent); font-weight:700; min-width:18px;">3.</span><span>Enter max article length, width, height and weight capacity for manufacturability matching.</span></div>
+                <div style="display:flex; gap:8px; margin-bottom:6px;"><span style="color:var(--accent); font-weight:700; min-width:18px;">4.</span><span>Click <strong>Save</strong> after entering all machine details.</span></div>
+                <div style="display:flex; gap:8px; margin-bottom:6px;"><span style="color:var(--accent); font-weight:700; min-width:18px;">5.</span><span>Navigate to <strong>Internal Manufacturing Steps</strong> — add steps like milling, turning, grinding, etc.</span></div>
+                <div style="display:flex; gap:8px; margin-bottom:6px;"><span style="color:var(--accent); font-weight:700; min-width:18px;">6.</span><span>If applicable, add a <strong>Turn-Milling</strong> step combining both technologies.</span></div>
+                <div style="display:flex; gap:8px; margin-bottom:6px;"><span style="color:var(--accent); font-weight:700; min-width:18px;">7.</span><span>Select the <strong>machining rate</strong> for calculations — pulled from your machine list.</span></div>
+                <div style="display:flex; gap:8px;"><span style="color:var(--accent); font-weight:700; min-width:18px;">8.</span><span>Save your settings — you're ready for your first time estimation!</span></div>
+              </div>
+
+              <a href="https://25784863.hs-sites-eu1.com/de/knowledge/settings-for-the-first-time-estimation" target="_blank" style="display:inline-flex; align-items:center; gap:6px; margin-top:1rem; font-size:0.82rem; color:var(--accent); text-decoration:none; opacity:0.8; transition:opacity 0.3s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                Read full article in Knowledge Base
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" style="width:100%; max-width:400px; justify-content:center; margin:2rem auto 0; display:flex;" onclick="completeStep(4)">Mark Setup as Complete &rarr;</button>
+  </div>
+</section>
+
+<!-- STEP 5: How-To Videos -->
+<section class="step-section" id="step5" data-step="5" style="min-height:auto; padding:6rem 2rem;">
+  <div style="max-width:1100px; width:100%;">
+    <div style="text-align:center; margin-bottom:3rem;">
+      <div class="step-number" style="margin-bottom:0.8rem;">Step 05 / 05</div>
+      <h2 style="font-size:2rem; font-weight:700; letter-spacing:-0.5px; margin-bottom:0.8rem;">Watch How-To Videos</h2>
+      <p style="color:var(--text-secondary); max-width:600px; margin:0 auto;">Learn how to use each feature with short, guided video tutorials. Select a category to see the relevant videos for your workflow.</p>
+    </div>
+
+    <!-- Video category selector -->
+    <div class="path-selector">
+      <div class="path-btn" id="v5-similarity" onclick="switchVideoCategory('similarity')">
+        <div class="path-icon">&#128269;</div>
+        <div class="path-label">Similarity Search</div>
+        <div class="path-desc">Find and compare similar parts</div>
+      </div>
+      <div class="path-btn" id="v5-estimation" onclick="switchVideoCategory('estimation')">
+        <div class="path-icon">&#9202;</div>
+        <div class="path-label">Time Estimations</div>
+        <div class="path-desc">Generate accurate CNC time estimates</div>
+      </div>
+      <div class="path-btn" id="v5-quotes" onclick="switchVideoCategory('quotes')">
+        <div class="path-icon">&#128196;</div>
+        <div class="path-label">Quotations</div>
+        <div class="path-desc">Create professional quotes with prices</div>
+      </div>
+    </div>
+
+    <!-- Similarity Search Videos -->
+    <div class="path-content" id="videos-similarity">
+      <div class="video-grid">
+        <div class="video-card" onclick="playVideo(this)"><div class="video-thumb"><div class="play"><svg width="14" height="14" viewBox="0 0 14 14" fill="white"><path d="M3 1l10 6-10 6z"/></svg></div><span class="duration">4:35</span></div><div class="video-title">How to use Similarity Search</div></div>
+        <div class="video-card" onclick="playVideo(this)"><div class="video-thumb"><div class="play"><svg width="14" height="14" viewBox="0 0 14 14" fill="white"><path d="M3 1l10 6-10 6z"/></svg></div><span class="duration">5:20</span></div><div class="video-title">Bulk Import &mdash; Upload Your Production Data</div></div>
+        <div class="video-card" onclick="playVideo(this)"><div class="video-thumb"><div class="play"><svg width="14" height="14" viewBox="0 0 14 14" fill="white"><path d="M3 1l10 6-10 6z"/></svg></div><span class="duration">3:45</span></div><div class="video-title">Search Filters & Parameters</div></div>
+        <div class="video-card" onclick="playVideo(this)"><div class="video-thumb"><div class="play"><svg width="14" height="14" viewBox="0 0 14 14" fill="white"><path d="M3 1l10 6-10 6z"/></svg></div><span class="duration">3:10</span></div><div class="video-title">Managing Your Digital Parts Archive</div></div>
+      </div>
+    </div>
+
+    <!-- Time Estimation Videos -->
+    <div class="path-content" id="videos-estimation">
+      <div class="video-grid">
+        <div class="video-card" onclick="playVideo(this)"><div class="video-thumb"><div class="play"><svg width="14" height="14" viewBox="0 0 14 14" fill="white"><path d="M3 1l10 6-10 6z"/></svg></div><span class="duration">4:35</span></div><div class="video-title">Time Estimation & Similarity Search</div></div>
+        <div class="video-card" onclick="playVideo(this)"><div class="video-thumb"><div class="play"><svg width="14" height="14" viewBox="0 0 14 14" fill="white"><path d="M3 1l10 6-10 6z"/></svg></div><span class="duration">3:50</span></div><div class="video-title">From Estimation to Article with Real Production Times</div></div>
+        <div class="video-card" onclick="playVideo(this)"><div class="video-thumb"><div class="play"><svg width="14" height="14" viewBox="0 0 14 14" fill="white"><path d="M3 1l10 6-10 6z"/></svg></div><span class="duration">5:20</span></div><div class="video-title">Bulk Import &mdash; Train AI with Existing Production Data</div></div>
+        <div class="video-card" onclick="playVideo(this)"><div class="video-thumb"><div class="play"><svg width="14" height="14" viewBox="0 0 14 14" fill="white"><path d="M3 1l10 6-10 6z"/></svg></div><span class="duration">4:15</span></div><div class="video-title">Configure Machines & Manufacturing Steps</div></div>
+      </div>
+    </div>
+
+    <!-- Quotation Videos -->
+    <div class="path-content" id="videos-quotes">
+      <div class="video-grid">
+        <div class="video-card" onclick="playVideo(this)"><div class="video-thumb"><div class="play"><svg width="14" height="14" viewBox="0 0 14 14" fill="white"><path d="M3 1l10 6-10 6z"/></svg></div><span class="duration">4:12</span></div><div class="video-title">Platform Overview & Navigation</div></div>
+        <div class="video-card" onclick="playVideo(this)"><div class="video-thumb"><div class="play"><svg width="14" height="14" viewBox="0 0 14 14" fill="white"><path d="M3 1l10 6-10 6z"/></svg></div><span class="duration">5:03</span></div><div class="video-title">Import & Manage Machine Data</div></div>
+        <div class="video-card" onclick="playVideo(this)"><div class="video-thumb"><div class="play"><svg width="14" height="14" viewBox="0 0 14 14" fill="white"><path d="M3 1l10 6-10 6z"/></svg></div><span class="duration">4:28</span></div><div class="video-title">Create & Export Quotes</div></div>
+        <div class="video-card" onclick="playVideo(this)"><div class="video-thumb"><div class="play"><svg width="14" height="14" viewBox="0 0 14 14" fill="white"><path d="M3 1l10 6-10 6z"/></svg></div><span class="duration">3:40</span></div><div class="video-title">Manufacturing Plans & Pricing</div></div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" style="width:100%; max-width:400px; justify-content:center; margin:2rem auto 0; display:flex;" onclick="completeStep(5)">Videos Complete &rarr;</button>
+  </div>
+</section>
+
+<!-- CELEBRATION OVERLAY (shown when all steps done) -->
+<div class="celebration-overlay" id="celebrationOverlay">
+  <div class="celebration-content">
+    <div class="celebration-sparkles" id="sparkleContainer"></div>
+
+    <!-- imnoo Robot "Marvin" -->
+    <div class="robot-container">
+      <svg viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Glow behind robot -->
+        <circle cx="90" cy="95" r="60" fill="url(#robotGlow)" opacity="0.3"/>
+
+        <!-- Body -->
+        <rect x="55" y="80" width="70" height="65" rx="16" fill="#162332" stroke="#00BFA5" stroke-width="2.5"/>
+        <!-- Chest light -->
+        <circle cx="90" cy="105" r="8" fill="#00BFA5" opacity="0.7"/>
+        <circle cx="90" cy="105" r="4" fill="#33CFBA"/>
+
+        <!-- Head -->
+        <rect x="60" y="38" width="60" height="48" rx="14" fill="#162332" stroke="#00BFA5" stroke-width="2.5"/>
+        <!-- Eyes -->
+        <circle cx="77" cy="58" r="6" fill="#00BFA5">
+          <animate attributeName="r" values="6;5;6" dur="3s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="103" cy="58" r="6" fill="#00BFA5">
+          <animate attributeName="r" values="6;5;6" dur="3s" repeatCount="indefinite"/>
+        </circle>
+        <!-- Eye highlights -->
+        <circle cx="79" cy="56" r="2" fill="#fff" opacity="0.8"/>
+        <circle cx="105" cy="56" r="2" fill="#fff" opacity="0.8"/>
+        <!-- Smile -->
+        <path d="M78 70 Q90 80 102 70" stroke="#33CFBA" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+        <!-- Antenna -->
+        <line x1="90" y1="38" x2="90" y2="25" stroke="#00BFA5" stroke-width="2"/>
+        <circle cx="90" cy="22" r="4" fill="#33CFBA">
+          <animate attributeName="opacity" values="1;0.4;1" dur="2s" repeatCount="indefinite"/>
+        </circle>
+
+        <!-- Left arm (static, holding a little gift) -->
+        <g>
+          <rect x="32" y="88" width="22" height="10" rx="5" fill="#162332" stroke="#00BFA5" stroke-width="2"/>
+          <!-- Mini gift box -->
+          <rect x="28" y="78" width="16" height="12" rx="3" fill="#00BFA5" opacity="0.8"/>
+          <line x1="36" y1="78" x2="36" y2="90" stroke="#fff" stroke-width="1.5"/>
+          <path d="M30 78 Q36 73 42 78" stroke="#fff" stroke-width="1.5" fill="none"/>
+        </g>
+
+        <!-- Right arm (waving) -->
+        <g class="robot-arm-right">
+          <rect x="126" y="85" width="22" height="10" rx="5" fill="#162332" stroke="#00BFA5" stroke-width="2"/>
+          <!-- Hand/wave lines -->
+          <line x1="152" y1="82" x2="157" y2="77" stroke="#33CFBA" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+          <line x1="155" y1="87" x2="161" y2="84" stroke="#33CFBA" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+          <line x1="153" y1="92" x2="159" y2="91" stroke="#33CFBA" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+        </g>
+
+        <!-- Legs -->
+        <rect x="68" y="145" width="14" height="18" rx="6" fill="#162332" stroke="#00BFA5" stroke-width="2"/>
+        <rect x="98" y="145" width="14" height="18" rx="6" fill="#162332" stroke="#00BFA5" stroke-width="2"/>
+        <!-- Feet -->
+        <rect x="64" y="160" width="22" height="8" rx="4" fill="#162332" stroke="#00BFA5" stroke-width="2"/>
+        <rect x="94" y="160" width="22" height="8" rx="4" fill="#162332" stroke="#00BFA5" stroke-width="2"/>
+
+        <defs>
+          <radialGradient id="robotGlow">
+            <stop offset="0%" stop-color="#00BFA5" stop-opacity="0.6"/>
+            <stop offset="100%" stop-color="#00BFA5" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+      </svg>
+    </div>
+
+    <h2 class="celebration-title">You did it! Onboarding Complete!</h2>
+    <p class="celebration-subtitle">
+      Congratulations! You've successfully set up your imnoo platform.<br>
+      Your AI-powered CNC calculation tool is ready to go.<br>
+      Book a meeting with your Customer Success Manager to get the most out of imnoo.
+    </p>
+
+    <div class="celebration-actions">
+      <a href="https://calendly.com/imnoo/customer-success" target="_blank" class="btn-book">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/>
+        </svg>
+        Book a Meeting with your CSM
+      </a>
+      <button class="celebration-dismiss" onclick="closeCelebration()">Continue exploring the platform</button>
+    </div>
+  </div>
+</div>
+
+<footer>&copy; 2026 imnoo &middot; CNC Time Estimation & Quoting Platform</footer>
+
+<!-- FLOATING PROGRESS WIDGET -->
+<div class="progress-widget" id="progressWidget">
+  <!-- Toggle button with mini ring -->
+  <div class="widget-toggle" id="widgetToggle" onclick="toggleWidget()">
+    <svg viewBox="0 0 56 56">
+      <circle cx="28" cy="28" r="23" fill="none" stroke="var(--border)" stroke-width="3"/>
+      <circle cx="28" cy="28" r="23" fill="none" stroke="var(--accent)" stroke-width="3"
+        stroke-linecap="round" stroke-dasharray="144.513"
+        id="miniRing" style="stroke-dashoffset: 144.513; transform: rotate(-90deg); transform-origin: center; transition: stroke-dashoffset 0.8s cubic-bezier(0.4,0,0.2,1);" />
+    </svg>
+    <span class="toggle-pct" id="togglePct">0%</span>
+  </div>
+
+  <!-- Expandable panel -->
+  <div class="widget-panel" id="widgetPanel">
+    <div class="widget-title">Onboarding Progress</div>
+
+    <div class="widget-ring-wrap">
+      <svg class="widget-ring" viewBox="0 0 64 64">
+        <circle class="bg" cx="32" cy="32" r="28"/>
+        <circle class="fill" cx="32" cy="32" r="28" id="widgetCircle" style="stroke-dashoffset: 175.929"/>
+      </svg>
+      <div>
+        <div class="widget-pct" id="widgetPct">0%</div>
+        <div class="widget-pct-label">completed</div>
+      </div>
+    </div>
+
+    <div class="widget-steps" id="widgetSteps">
+      <div class="widget-step-row current" data-step="1" onclick="scrollToStep(1)">
+        <div class="widget-step-dot">&#10003;</div>
+        <span>Account & Login</span>
+      </div>
+      <div class="widget-step-row" data-step="2" onclick="scrollToStep(2)">
+        <div class="widget-step-dot">&#10003;</div>
+        <span>Process Questionnaire</span>
+      </div>
+      <div class="widget-step-row" data-step="3" onclick="scrollToStep(3)">
+        <div class="widget-step-dot">&#10003;</div>
+        <span>Define Goals</span>
+      </div>
+      <div class="widget-step-row" data-step="4" onclick="scrollToStep(4)">
+        <div class="widget-step-dot">&#10003;</div>
+        <span>Account Setup</span>
+      </div>
+      <div class="widget-step-row" data-step="5" onclick="scrollToStep(5)">
+        <div class="widget-step-dot">&#10003;</div>
+        <span>How-To Videos</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-icon">&#10003;</span>
+  <span id="toastText">Step completed!</span>
+</div>
+
+<script>
+  const completedSteps = new Set();
+  const TOTAL_STEPS = 5;
+  const WIDGET_CIRCUMFERENCE = 2 * Math.PI * 28; // 175.929
+  const MINI_CIRCUMFERENCE = 2 * Math.PI * 23;   // 144.513
+  let widgetOpen = false;
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.classList.add('visible');
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.step-section').forEach(s => observer.observe(s));
+
+  // Show floating widget after scrolling past hero
+  const heroObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      const widget = document.getElementById('progressWidget');
+      if (!e.isIntersecting) {
+        widget.classList.add('visible');
+      } else {
+        widget.classList.remove('visible');
+        // Close panel when returning to hero
+        widgetOpen = false;
+        document.getElementById('widgetPanel').classList.remove('open');
+      }
+    });
+  }, { threshold: 0.3 });
+  heroObserver.observe(document.querySelector('.hero'));
+
+  function scrollToStep(n) {
+    document.getElementById('step' + n)?.scrollIntoView({ behavior: 'smooth' });
+    // Close widget panel on navigation
+    widgetOpen = false;
+    document.getElementById('widgetPanel').classList.remove('open');
+  }
+
+  function toggleWidget() {
+    widgetOpen = !widgetOpen;
+    document.getElementById('widgetPanel').classList.toggle('open', widgetOpen);
+  }
+
+  // Close widget when clicking outside
+  document.addEventListener('click', (e) => {
+    const widget = document.getElementById('progressWidget');
+    if (widgetOpen && !widget.contains(e.target)) {
+      widgetOpen = false;
+      document.getElementById('widgetPanel').classList.remove('open');
+    }
+  });
+
+  function launchConfetti() {
+    const container = document.createElement('div');
+    container.className = 'confetti-container';
+    document.body.appendChild(container);
+
+    const colors = ['#00BFA5', '#33CFBA', '#F5A623', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96E6A1', '#DDA0DD', '#FFD93D', '#6BCB77'];
+    const shapes = ['', 'circle', 'rect', 'star'];
+    const count = 35;
+
+    for (let i = 0; i < count; i++) {
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece ' + shapes[Math.floor(Math.random() * shapes.length)];
+
+      // Random direction: spread upward and outward in all directions
+      const angle = (Math.random() * 360) * (Math.PI / 180);
+      const velocity = 80 + Math.random() * 160;
+      const tx = Math.cos(angle) * velocity;
+      const ty = -Math.abs(Math.sin(angle) * velocity) - (30 + Math.random() * 100); // Always go UP
+      const rot = (Math.random() - 0.5) * 1080; // spin up to 3 full rotations
+      const duration = 0.8 + Math.random() * 0.8;
+      const delay = Math.random() * 0.15;
+
+      piece.style.setProperty('--tx', tx + 'px');
+      piece.style.setProperty('--ty', ty + 'px');
+      piece.style.setProperty('--rot', rot + 'deg');
+      piece.style.setProperty('--duration', duration + 's');
+      piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      piece.style.animationDelay = delay + 's';
+
+      container.appendChild(piece);
+    }
+
+    // Clean up after animation
+    setTimeout(() => container.remove(), 2000);
+  }
+
+  function completeStep(n) {
+    completedSteps.add(n);
+    updateNavProgress();
+    updateWidget();
+    showToast('Step ' + n + ' completed!');
+
+    // Launch confetti from the widget button
+    launchConfetti();
+
+    // Celebrate animation on widget
+    const widget = document.getElementById('progressWidget');
+    widget.classList.add('celebrate');
+    setTimeout(() => widget.classList.remove('celebrate'), 600);
+
+    // Auto-open widget briefly to show progress
+    if (!widgetOpen) {
+      widgetOpen = true;
+      document.getElementById('widgetPanel').classList.add('open');
+      setTimeout(() => {
+        if (widgetOpen) {
+          widgetOpen = false;
+          document.getElementById('widgetPanel').classList.remove('open');
+        }
+      }, 2500);
+    }
+
+    // When completing Step 3, auto-select matching path in Step 4
+    if (n === 3) {
+      syncStep4WithGoals();
+    }
+
+    // Auto-scroll to next step
+    if (n < TOTAL_STEPS) {
+      setTimeout(() => scrollToStep(n + 1), 800);
+    }
+
+    // Show celebration overlay when all done — robot pops out!
+    if (completedSteps.size === TOTAL_STEPS) {
+      setTimeout(() => launchConfetti(), 300);
+      setTimeout(() => launchConfetti(), 600);
+      setTimeout(() => launchConfetti(), 900);
+      setTimeout(() => {
+        showCelebration();
+      }, 1200);
+    }
+  }
+
+  function updateNavProgress() {
+    document.querySelectorAll('.nav-dot').forEach(dot => {
+      const step = parseInt(dot.dataset.step);
+      dot.classList.remove('completed', 'active');
+      if (completedSteps.has(step)) {
+        dot.classList.add('completed');
+      }
+    });
+    // Find first incomplete step
+    for (let i = 1; i <= TOTAL_STEPS; i++) {
+      if (!completedSteps.has(i)) {
+        document.querySelector(`.nav-dot[data-step="${i}"]`)?.classList.add('active');
+        break;
+      }
+    }
+    // Update lines
+    document.querySelectorAll('.nav-line').forEach((line, i) => {
+      line.classList.toggle('completed', completedSteps.has(i + 1));
+    });
+    document.getElementById('progressLabel').textContent = `Step ${completedSteps.size} / ${TOTAL_STEPS}`;
+  }
+
+  function updateWidget() {
+    const pct = Math.round((completedSteps.size / TOTAL_STEPS) * 100);
+
+    // Update mini ring on toggle button
+    const miniOffset = MINI_CIRCUMFERENCE - (MINI_CIRCUMFERENCE * pct / 100);
+    document.getElementById('miniRing').style.strokeDashoffset = miniOffset;
+    document.getElementById('togglePct').textContent = pct + '%';
+
+    // Update panel ring
+    const widgetOffset = WIDGET_CIRCUMFERENCE - (WIDGET_CIRCUMFERENCE * pct / 100);
+    document.getElementById('widgetCircle').style.strokeDashoffset = widgetOffset;
+    document.getElementById('widgetPct').textContent = pct + '%';
+
+    // Update step rows
+    document.querySelectorAll('.widget-step-row').forEach(row => {
+      const step = parseInt(row.dataset.step);
+      row.classList.remove('done', 'current');
+      if (completedSteps.has(step)) {
+        row.classList.add('done');
+      }
+    });
+    // Mark first incomplete as current
+    for (let i = 1; i <= TOTAL_STEPS; i++) {
+      if (!completedSteps.has(i)) {
+        document.querySelector(`.widget-step-row[data-step="${i}"]`)?.classList.add('current');
+        break;
+      }
+    }
+  }
+
+  function toggleMilestone(el) {
+    el.classList.toggle('selected');
+  }
+
+  function playVideo(el) {
+    const thumb = el.querySelector('.video-thumb');
+    thumb.style.background = 'linear-gradient(135deg, var(--accent-glow), rgba(0,191,165,0.08))';
+    thumb.querySelector('.play').innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" fill="white"><rect x="2" y="2" width="4" height="10" rx="1"/><rect x="8" y="2" width="4" height="10" rx="1"/></svg>';
+    showToast('Now playing: ' + el.querySelector('.video-title').textContent);
+  }
+
+  let selectedGoalPath = null;
+
+  function selectGoalPath(path) {
+    document.querySelectorAll('[id^="goal-"]').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('[id^="goals-"]').forEach(p => p.classList.remove('active'));
+    document.getElementById('goal-' + path).classList.add('active');
+    document.getElementById('goals-' + path).classList.add('active');
+    selectedGoalPath = path;
+  }
+
+  function toggleSubInput(milestoneEl, inputId) {
+    const inputDiv = document.getElementById(inputId);
+    if (milestoneEl.classList.contains('selected')) {
+      inputDiv.style.display = 'block';
+      const inp = inputDiv.querySelector('input');
+      if (inp) setTimeout(() => inp.focus(), 100);
+    } else {
+      inputDiv.style.display = 'none';
+    }
+  }
+
+  function toggleErpOther() {
+    const sel = document.getElementById('erpSelect');
+    const other = document.getElementById('erpOther');
+    other.style.display = sel.value === 'Other' ? 'block' : 'none';
+    if (sel.value === 'Other') other.focus();
+  }
+
+  function switchVideoCategory(cat) {
+    document.querySelectorAll('[id^="v5-"]').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('[id^="videos-"]').forEach(p => p.classList.remove('active'));
+    document.getElementById('v5-' + cat)?.classList.add('active');
+    document.getElementById('videos-' + cat)?.classList.add('active');
+  }
+
+  function switchPath(path) {
+    document.querySelectorAll('#step4 .path-selector .path-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('path-similarity').classList.remove('active');
+    document.getElementById('path-estimation').classList.remove('active');
+    document.getElementById('path-quotes').classList.remove('active');
+    document.getElementById('s4-' + path)?.classList.add('active');
+    document.getElementById('path-' + path)?.classList.add('active');
+  }
+
+  function syncStep4WithGoals() {
+    if (!selectedGoalPath) return;
+    const mapping = { similarity: 'similarity', estimation: 'estimation', quotation: 'quotes' };
+    const s4path = mapping[selectedGoalPath] || 'quotes';
+    switchPath(s4path);
+    switchVideoCategory(s4path);
+  }
+
+  function selectSetupStep(el, pathPrefix) {
+    // Find the parent path-content container
+    const container = el.closest('.path-content');
+    if (!container) return;
+
+    // Remove active class from all setup steps in this path
+    container.querySelectorAll('.setup-step').forEach(s => s.classList.remove('active'));
+
+    // Add active class to clicked step
+    el.classList.add('active');
+
+    // Hide the placeholder
+    const placeholder = container.querySelector('.step-detail-placeholder');
+    if (placeholder) placeholder.classList.add('hidden');
+
+    // Hide all detail panels in this path
+    container.querySelectorAll('.step-detail').forEach(d => d.classList.remove('active'));
+
+    // Show the matching detail panel
+    const detailId = el.getAttribute('data-detail');
+    const detailPanel = document.getElementById('detail-' + detailId);
+    if (detailPanel) detailPanel.classList.add('active');
+  }
+
+  function toggleSetupStep(el) {
+    el.classList.toggle('done');
+    const num = el.querySelector('.step-num');
+    if (el.classList.contains('done')) {
+      num.textContent = '\u2713';
+      showToast('Completed: ' + el.querySelector('.step-label').textContent);
+    } else {
+      const steps = el.parentElement.querySelectorAll('.setup-step');
+      num.textContent = Array.from(steps).indexOf(el) + 1;
+    }
+  }
+
+  function showCelebration() {
+    const overlay = document.getElementById('celebrationOverlay');
+    // Generate sparkles
+    const sparkleContainer = document.getElementById('sparkleContainer');
+    for (let i = 0; i < 20; i++) {
+      const sparkle = document.createElement('div');
+      sparkle.className = 'sparkle';
+      sparkle.style.left = Math.random() * 100 + '%';
+      sparkle.style.top = Math.random() * 100 + '%';
+      sparkle.style.animationDelay = (Math.random() * 2) + 's';
+      sparkle.style.animationDuration = (1.5 + Math.random() * 1.5) + 's';
+      sparkle.style.width = (3 + Math.random() * 4) + 'px';
+      sparkle.style.height = sparkle.style.width;
+      sparkleContainer.appendChild(sparkle);
+    }
+    overlay.classList.add('visible');
+    // Launch extra confetti bursts from the center
+    setTimeout(() => launchConfetti(), 400);
+    setTimeout(() => launchConfetti(), 800);
+  }
+
+  function closeCelebration() {
+    const overlay = document.getElementById('celebrationOverlay');
+    overlay.classList.remove('visible');
+  }
+
+  function loadLoomVideo(wrapper) {
+    // Replace thumbnail with Loom iframe player
+    wrapper.style.cursor = 'default';
+    wrapper.onclick = null;
+    wrapper.onmouseover = null;
+    wrapper.onmouseout = null;
+    wrapper.style.borderColor = 'var(--border)';
+    wrapper.innerHTML = '<iframe src="https://www.loom.com/embed/87c7cf0a41104b70ae520d3a573c17ea?t=0&hide_owner=true&hide_share=true&hide_title=true&hideEmbedTopBar=true&autoplay=1" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen allow="autoplay" style="position:absolute; top:0; left:0; width:100%; height:100%; border-radius:10px;"></iframe>';
+    wrapper.style.position = 'relative';
+    wrapper.style.paddingBottom = '56.25%';
+    wrapper.style.height = '0';
+    wrapper.style.aspectRatio = 'unset';
+  }
+
+  function showToast(text) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toastText').textContent = text;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+
+  // Initialize
+  updateNavProgress();
+  updateWidget();
+</script>
+</body>
+</html>
